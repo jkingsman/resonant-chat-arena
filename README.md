@@ -17,7 +17,7 @@ Most models were kinda boring but a little weird, except for `gemma3:27b-it-q8_0
 ```bash
 git clone https://github.com/jkingsman/resonant-chat-arena.git
 cd resonant-chat-arena
-pip install . # or `uv pip install -r pyproject.toml`
+pip install . # or `uv sync`
 ```
 
 ### Direct run via `uvx`
