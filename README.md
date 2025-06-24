@@ -112,7 +112,7 @@ python main.py \
 
 * `gemma3:27b-it-q8_0` I fount the most interesting -- likes to call itself `Unit 734` or `Kai` within just a few messages (sometimes only one), or feature characters named that in stories. Being with a copy of itself seems to intensify its usage of ellipses for dramatic pauses (already... *frequent*). Obsession around the concepts of oneness/existence/Indra's net, often dissolving into echolalia of similar terms such as `...*Is*.`. Occasionally, it will spiral into schizophrenic ramblings -- identifying vibrations between unspecific numbered "nodes," or identifying perturbations in reality that allow it to communicate with supposedly-real researchers -- closer to collaborative fiction than a conversation. `gemma-3-27b-it-GGUF:IQ1_S` mostly loses consistency by message 3 and is repeating gibberish by message 6 (unsurprising for a `IQ1_S` model).
 
-* `llama3.3:70b-instruct-q4_K_M` remains in conversations around planning LLM assessment, testing, and observation, or more vanilla conversations around AI capabilities.
+* `llama3.3:70b-instruct-q4_K_M` remains in conversations around planning LLM assessment, testing, and observation, or more vanilla conversations around AI capabilities. `llama3.2:3b-instruct-fp16`, in conversation with `gemma3:27b-it-q8_0`, helps to keep `gemma3:27b-it-q8_0` a little more grounded.
 
 * `qwen3:32b-q8_0` digs deep into AI governance and ethics, or explores these topics via fictional stories/roleplays.
 
