@@ -17,6 +17,7 @@ class TestSaveHtmlCheckpoint(unittest.TestCase):
         self.mock_session.bob_model = "claude-3"
         self.mock_session.alice_endpoint = "https://api.openai.com"
         self.mock_session.bob_endpoint = "https://api.anthropic.com"
+        self.mock_session.system_prompt = "Have a conversation."
         self.mock_session.max_chars = 10000
         self.mock_session.max_turns = 30
         self.mock_session.html_filename = "test_output.html"

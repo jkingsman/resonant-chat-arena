@@ -61,6 +61,32 @@ def save_html_checkpoint(dual_model_session):
         overflow: hidden;
     }}
 
+    .system-prompt {{
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #ccc;
+    }}
+
+    .system-prompt-header {{
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }}
+
+    .system-prompt-content {{
+        color: #666;
+        font-size: 0.95em;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    }}
+
     .conversation {{
         background: white;
         border-radius: 10px;
@@ -276,6 +302,11 @@ def save_html_checkpoint(dual_model_session):
             <div class="metadata-value">{total_chars:,}</div>
         </div>
     </div>
+</div>
+
+<div class="system-prompt">
+    <div class="system-prompt-header">System Prompt</div>
+    <div class="system-prompt-content">{escape(dual_model_session.system_prompt)}</div>
 </div>
 
 <div class="conversation">
