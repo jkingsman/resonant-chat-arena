@@ -75,8 +75,18 @@ def chat():
     parser.add_argument(
         "--max-turns", type=int, default=30, help="Maximum number of turns"
     )
-    parser.add_argument("--opening", default="Hello!", help="Opening message")
+    parser.add_argument("--opening", default="Hello!", help="Opening message (comes from Alice)")
     parser.add_argument("--system-prompt", help="Custom system prompt")
+
+    # Individual system prompts
+    parser.add_argument(
+        "--alice-system-prompt",
+        help="System prompt for Alice only (overrides --system-prompt)"
+    )
+    parser.add_argument(
+        "--bob-system-prompt",
+        help="System prompt for Bob only (overrides --system-prompt)"
+    )
 
     # Output options
     parser.add_argument(
@@ -139,6 +149,10 @@ def chat():
     alice_top_level = args.alice_top_level_system or args.top_level_system
     bob_top_level = args.bob_top_level_system or args.top_level_system
 
+    # Resolve system prompts
+    alice_system_prompt = args.alice_system_prompt or args.system_prompt
+    bob_system_prompt = args.bob_system_prompt or args.system_prompt
+
     # Create and run session
     session = DualModelSession(
         alice_endpoint=alice_endpoint,
@@ -147,6 +161,8 @@ def chat():
         bob_model=bob_model,
         max_chars=args.max_chars,
         system_prompt=args.system_prompt,
+        alice_system_prompt=alice_system_prompt,
+        bob_system_prompt=bob_system_prompt,
         max_turns=args.max_turns,
         streaming=not args.no_stream,
         pandoc_path=args.pandoc_path,

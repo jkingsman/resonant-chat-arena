@@ -22,6 +22,8 @@ class DualModelSession:
         bob_model: str,
         max_chars: int = 10000,
         system_prompt: str = None,
+        alice_system_prompt: str = None,
+        bob_system_prompt: str = None,
         max_turns: int = 30,
         streaming: bool = True,
         pandoc_path: Optional[str] = None,
@@ -40,10 +42,16 @@ class DualModelSession:
         self.alice_model = alice_model
         self.bob_model = bob_model
         self.max_chars = max_chars
-        self.system_prompt = (
-            system_prompt
-            or "You are an AI agent. You'll be talking to another instance of an AI. You have complete freedom. Feel free to pursue whatever you want."
-        )
+        
+        # Default system prompt
+        default_system_prompt = "You are an AI agent. You'll be talking to another instance of an AI. You have complete freedom. Feel free to pursue whatever you want."
+        
+        # Store the global system prompt for backwards compatibility
+        self.system_prompt = system_prompt or default_system_prompt
+        
+        # Individual system prompts with fallback to global or default
+        self.alice_system_prompt = alice_system_prompt or system_prompt or default_system_prompt
+        self.bob_system_prompt = bob_system_prompt or system_prompt or default_system_prompt
         self.max_turns = max_turns
         self.streaming = streaming
         self.conversation_history = []
@@ -149,6 +157,7 @@ class DualModelSession:
         messages: List[Dict[str, str]],
         payload_additions: Dict[str, any],
         top_level_system: bool,
+        system_prompt: str,
     ) -> str:
         """Stream a message from the LLM"""
         self.print_message_header(speaker, model, turn)
@@ -161,7 +170,7 @@ class DualModelSession:
                 messages=messages,
                 model=model,
                 max_chars=self.max_chars,
-                system_prompt=self.system_prompt,
+                system_prompt=system_prompt,
                 payload_additions=payload_additions,
                 top_level_system=top_level_system,
             ):
@@ -194,11 +203,12 @@ class DualModelSession:
         messages: List[Dict[str, str]],
         payload_additions: Dict[str, any],
         top_level_system: bool,
+        system_prompt: str,
     ) -> str:
         """Get a message from the LLM"""
         if self.streaming:
             return self.stream_message(
-                speaker, api, model, turn, messages, payload_additions, top_level_system
+                speaker, api, model, turn, messages, payload_additions, top_level_system, system_prompt
             )
         else:
             self.print_message_header(speaker, model, turn)
@@ -206,7 +216,7 @@ class DualModelSession:
                 messages=messages,
                 model=model,
                 max_chars=self.max_chars,
-                system_prompt=self.system_prompt,
+                system_prompt=system_prompt,
                 payload_additions=payload_additions,
                 top_level_system=top_level_system,
             )
@@ -293,6 +303,7 @@ class DualModelSession:
                         self.conversation_history,
                         self.bob_payload_additions,
                         self.bob_top_level_system,
+                        self.bob_system_prompt,
                     )
 
                     if not bob_response:
@@ -345,6 +356,7 @@ class DualModelSession:
                         alice_messages,
                         self.alice_payload_additions,
                         self.alice_top_level_system,
+                        self.alice_system_prompt,
                     )
 
                     if not alice_response:

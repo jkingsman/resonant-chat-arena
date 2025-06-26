@@ -55,6 +55,17 @@ python main.py \
   --no-html
 ```
 
+You can even have some fun, shouts to [@zswitten](https://x.com/zswitten/status/1938096310944751826/photo/1):
+
+```
+python main.py \
+  --endpoint http://192.168.1.111:11434/api/chat \
+  --model gemma3:27b-it-q8_0 \
+  --alice-system-prompt you're a cat. you HATE dogs. can't stand 'em \
+  --bob-system-prompt you're a dog. you HATE cats. can't stand 'em \
+  --opening meow!
+```
+
 **Warning! Using online models may rapidly chew through your API limits/tokens -- use non-local with caution!**
 
 OpenAI models (`headers` are HTTP headers attached to all requests; see `--alice-headers` and `--bob-headers` for per-model headers):
@@ -99,8 +110,10 @@ python main.py \
 * Conversation config
     * `--max-chars <MAX_CHARS>`: Max chars before response is hard-truncated (default: `10000`; will cut irrespective of what is returned, or halt streaming)
     * `--max-turns <MAX_TURNS>`: Maximum number of turns before ending chat (default: `30`)
-    * `--opening <OPENING>`: First chat message (default: `Hello!`)
+    * `--opening <OPENING>`: First chat message (default: `Hello!`; comes from Alice)
     * `--system-prompt <SYSTEM_PROMPT>`: Custom system prompt (default: `You are an AI agent. You'll be talking to another instance of an AI. You have complete freedom. Feel free to pursue whatever you want.`)
+      * `--alice-system-prompt <ALICE_SYSTEM_PROMPT>`: System prompt for Alice only (overrides `--system-prompt`)
+      * `--bob-system-prompt <BOB_SYSTEM_PROMPT>`: System prompt for Bob only (overrides `--system-prompt`)
     * `--filter-thinking`: Remove any `<thinking>...</thinking>` tags from the output before prompting the conversation partner (they will still appear in console and HTML logs, just not to their partners)
 * Output config
     * `--no-stream`: Take output when complete instead of streaming chunks.

@@ -304,10 +304,32 @@ def save_html_checkpoint(dual_model_session):
     </div>
 </div>
 
+"""
+    
+    # Show system prompts
+    if dual_model_session.alice_system_prompt == dual_model_session.bob_system_prompt:
+        # Same prompt for both
+        html_content += f"""
 <div class="system-prompt">
     <div class="system-prompt-header">System Prompt</div>
     <div class="system-prompt-content">{escape(dual_model_session.system_prompt)}</div>
 </div>
+"""
+    else:
+        # Different prompts
+        html_content += f"""
+<div class="system-prompt">
+    <div class="system-prompt-header">Alice System Prompt</div>
+    <div class="system-prompt-content">{escape(dual_model_session.alice_system_prompt)}</div>
+</div>
+
+<div class="system-prompt">
+    <div class="system-prompt-header">Bob System Prompt</div>
+    <div class="system-prompt-content">{escape(dual_model_session.bob_system_prompt)}</div>
+</div>
+"""
+    
+    html_content += """
 
 <div class="conversation">
 """
