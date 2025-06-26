@@ -59,11 +59,11 @@ You can even have some fun, shouts to [@zswitten](https://x.com/zswitten/status/
 
 ```
 python main.py \
-  --endpoint http://192.168.1.111:11434/api/chat \
-  --model gemma3:27b-it-q8_0 \
-  --alice-system-prompt you're a cat. you HATE dogs. can't stand 'em \
-  --bob-system-prompt you're a dog. you HATE cats. can't stand 'em \
-  --opening meow!
+  --endpoint "http://192.168.1.111:11434/api/chat" \
+  --model "gemma3:27b-it-q8_0" \
+  --alice-system-prompt "you're a cat. you HATE dogs. can't stand 'em" \
+  --bob-system-prompt "you're a dog. you HATE cats. can't stand 'em" \
+  --opening "meow!"
 ```
 
 **Warning! Using online models may rapidly chew through your API limits/tokens -- use non-local with caution!**
