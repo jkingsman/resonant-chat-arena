@@ -34,6 +34,8 @@ class DualModelSession:
         alice_top_level_system: bool = False,
         bob_top_level_system: bool = False,
         filter_thinking: bool = False,
+        alice_preamble: Optional[List[Dict[str, str]]] = None,
+        bob_preamble: Optional[List[Dict[str, str]]] = None,
     ):
         self.alice_api = ChatAPI(alice_endpoint, headers=alice_headers)
         self.bob_api = ChatAPI(bob_endpoint, headers=bob_headers)
@@ -65,6 +67,10 @@ class DualModelSession:
         self.bob_top_level_system = bob_top_level_system
         self.html_filename = None  # Will be set at conversation start
         self.filter_thinking = filter_thinking
+        self.alice_preamble = alice_preamble or []
+        self.bob_preamble = bob_preamble or []
+        self.alice_conversation_history = []  # Separate history for Alice
+        self.bob_conversation_history = []    # Separate history for Bob
 
     def _find_pandoc(self) -> Optional[str]:
         """Find pandoc in system PATH"""
@@ -270,16 +276,41 @@ class DualModelSession:
             print("Bob: Using top-level system parameter (Anthropic-style)")
         print("=" * 60)
 
-        # Alice starts
+        # Initialize conversation histories with preambles
+        self.alice_conversation_history = list(self.alice_preamble)
+        self.bob_conversation_history = list(self.bob_preamble)
+        
+        # Log preambles to full conversation log if they exist
+        turn_counter = 1
+        
+        # Add Alice's preamble to log
+        for msg in self.alice_preamble:
+            self.full_conversation_log.append({
+                "turn": turn_counter,
+                "speaker": "Alice" if msg["role"] == "assistant" else "User (to Alice)",
+                "model": self.alice_model if msg["role"] == "assistant" else "preamble",
+                "content": msg["content"],
+                "char_count": len(msg["content"]),
+                "was_filtered": False,
+            })
+            turn_counter += 1
+        
+        # Alice speaks the opening message - it's her assistant message
+        self.alice_conversation_history.append({"role": "assistant", "content": opening_message})
+        # Bob receives it as a user message
+        self.bob_conversation_history.append({"role": "user", "content": opening_message})
+        
+        # For backward compatibility, keep the shared conversation_history starting with opening
         self.conversation_history = [{"role": "user", "content": opening_message}]
-        self.print_message_header("Alice", self.alice_model, 1)
+        
+        self.print_message_header("Alice", self.alice_model, turn_counter)
         print(opening_message)
         self.print_message_footer(len(opening_message))
 
         # Log for HTML
         self.full_conversation_log.append(
             {
-                "turn": 1,
+                "turn": turn_counter,
                 "speaker": "Alice",
                 "model": self.alice_model,
                 "content": opening_message,
@@ -287,20 +318,24 @@ class DualModelSession:
                 "was_filtered": False,
             }
         )
+        turn_counter += 1
 
         # Save HTML checkpoint after first turn
         save_html_checkpoint(self)
 
-        for turn in range(2, self.max_turns + 1):
+        # Main conversation loop - alternate between Bob and Alice
+        for i in range(self.max_turns - 1):  # -1 because opening message counts as turn 1
+            turn_num = turn_counter + i
+            
             try:
-                if turn % 2 == 0:
+                if i % 2 == 0:
                     # Bob's turn
                     bob_response = self.get_message(
                         "Bob",
                         self.bob_api,
                         self.bob_model,
-                        turn,
-                        self.conversation_history,
+                        turn_num,
+                        self.bob_conversation_history,
                         self.bob_payload_additions,
                         self.bob_top_level_system,
                         self.bob_system_prompt,
@@ -321,22 +356,26 @@ class DualModelSession:
                             print(
                                 "\n[Note: Thinking tags were filtered from the above response]"
                             )
-
-                        # Use filtered version for conversation history
-                        self.conversation_history.append(
-                            {"role": "assistant", "content": filtered_response}
-                        )
                     else:
                         filtered_response = bob_response
                         was_filtered = False
-                        self.conversation_history.append(
-                            {"role": "assistant", "content": bob_response}
-                        )
+
+                    # Update conversation histories - simple approach
+                    self.bob_conversation_history.append(
+                        {"role": "assistant", "content": bob_response}
+                    )
+                    self.alice_conversation_history.append(
+                        {"role": "user", "content": filtered_response}
+                    )
+                    # Keep backward compatible conversation_history
+                    self.conversation_history.append(
+                        {"role": "assistant", "content": filtered_response}
+                    )
 
                     # Store original (unfiltered) for HTML display
                     self.full_conversation_log.append(
                         {
-                            "turn": turn,
+                            "turn": turn_num,
                             "speaker": "Bob",
                             "model": self.bob_model,
                             "content": bob_response,  # Always store original
@@ -347,13 +386,12 @@ class DualModelSession:
 
                 else:
                     # Alice's turn
-                    alice_messages = self.swap_roles(self.conversation_history)
                     alice_response = self.get_message(
                         "Alice",
                         self.alice_api,
                         self.alice_model,
-                        turn,
-                        alice_messages,
+                        turn_num,
+                        self.alice_conversation_history,
                         self.alice_payload_additions,
                         self.alice_top_level_system,
                         self.alice_system_prompt,
@@ -374,22 +412,26 @@ class DualModelSession:
                             print(
                                 "\n[Note: Thinking tags were filtered from the above response]"
                             )
-
-                        # Use filtered version for conversation history
-                        self.conversation_history.append(
-                            {"role": "user", "content": filtered_response}
-                        )
                     else:
                         filtered_response = alice_response
                         was_filtered = False
-                        self.conversation_history.append(
-                            {"role": "user", "content": alice_response}
-                        )
+
+                    # Update conversation histories - simple approach
+                    self.alice_conversation_history.append(
+                        {"role": "assistant", "content": alice_response}
+                    )
+                    self.bob_conversation_history.append(
+                        {"role": "user", "content": filtered_response}
+                    )
+                    # Keep backward compatible conversation_history
+                    self.conversation_history.append(
+                        {"role": "user", "content": filtered_response}
+                    )
 
                     # Store original (unfiltered) for HTML display
                     self.full_conversation_log.append(
                         {
-                            "turn": turn,
+                            "turn": turn_num,
                             "speaker": "Alice",
                             "model": self.alice_model,
                             "content": alice_response,  # Always store original
@@ -408,11 +450,12 @@ class DualModelSession:
                 break
 
         print("\n" + "=" * 60)
-        if turn >= self.max_turns:
+        actual_turns = len(self.full_conversation_log) - len(self.alice_preamble)
+        if actual_turns >= self.max_turns:
             print("CONVERSATION DEPTH LIMIT REACHED")
         else:
             print("CONVERSATION ENDED")
-        print(f"Total turns: {min(turn, self.max_turns)}")
+        print(f"Total turns: {actual_turns}")
 
         # Calculate total characters
         total_chars = sum(

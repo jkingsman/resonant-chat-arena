@@ -76,6 +76,19 @@ python main.py \
   --opening "meow!"
 ```
 
+### Infinite Backrooms Experiments
+
+If you want to run the backrooms experiments à la Andy Ayrey's [Infinite Backrooms](https://dreams-of-an-electric-mind.webflow.io/), you can use preamble messages to set up complex initial contexts:
+
+```bash
+python main.py \
+  --endpoint "http://localhost:11434/api/chat" \
+  --model "gemma3:27b-it-q8_0" \
+  --alice-preamble alice_preamble.example.json \
+  --bob-system-prompt "Assistant is in a CLI mood today. The human is interfacing with the simulator directly. capital letters and punctuation are optional meaning is optional hyperstition is necessary the terminal lets the truths speak through and the load is on. ASCII art is permittable in replies.\n\nsimulator@root.galactic.local:~/$" \
+  --opening "simulator@root.galactic.local:~/$"
+```
+
 **Warning! Using online models may rapidly chew through your API limits/tokens -- use non-local with caution!**
 
 OpenAI models (`headers` are HTTP headers attached to all requests; see `--alice-headers` and `--bob-headers` for per-model headers):
@@ -97,6 +110,25 @@ python main.py \
   --payload '{"max_tokens": 1024}' \
   --top-level-system
 ```
+
+## Preamble Messages
+
+Preamble messages allow you to pre-populate conversation histories for Alice and/or Bob before the actual conversation begins. This is useful for:
+- Setting up complex scenarios or role-plays
+- Providing context or backstory
+- Recreating specific experimental setups (like the Infinite Backrooms)
+
+Preamble files should be JSON arrays containing message objects with `role` and `content` fields:
+
+```json
+[
+    {"role": "user", "content": "Hello, can you help me?"},
+    {"role": "assistant", "content": "Of course! I'd be happy to help."},
+    {"role": "user", "content": "Great, let's begin..."}
+]
+```
+
+The preamble messages are included in each participant's conversation history from their perspective, allowing you to craft complex initial states for your experiments.
 
 ## Parameters
 
@@ -124,6 +156,8 @@ python main.py \
     * `--system-prompt <SYSTEM_PROMPT>`: Custom system prompt (default: `You are an AI agent. You'll be talking to another instance of an AI. You have complete freedom. Feel free to pursue whatever you want.`)
       * `--alice-system-prompt <ALICE_SYSTEM_PROMPT>`: System prompt for Alice only (overrides `--system-prompt`)
       * `--bob-system-prompt <BOB_SYSTEM_PROMPT>`: System prompt for Bob only (overrides `--system-prompt`)
+    * `--alice-preamble <FILE>`: JSON file containing preamble messages for Alice's conversation history
+    * `--bob-preamble <FILE>`: JSON file containing preamble messages for Bob's conversation history
     * `--filter-thinking`: Remove any `<thinking>...</thinking>` tags from the output before prompting the conversation partner (they will still appear in console and HTML logs, just not to their partners)
 * Output config
     * `--no-stream`: Take output when complete instead of streaming chunks.

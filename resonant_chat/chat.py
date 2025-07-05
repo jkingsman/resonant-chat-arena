@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from .dual_model_session import DualModelSession
-from .utils import parse_headers, parse_payload_additions
+from .utils import parse_headers, parse_payload_additions, parse_preamble_file
 
 
 def chat():
@@ -88,6 +88,16 @@ def chat():
         help="System prompt for Bob only (overrides --system-prompt)"
     )
 
+    # Preamble files
+    parser.add_argument(
+        "--alice-preamble",
+        help="Path to JSON file containing Alice's preamble messages"
+    )
+    parser.add_argument(
+        "--bob-preamble",
+        help="Path to JSON file containing Bob's preamble messages"
+    )
+
     # Output options
     parser.add_argument(
         "--no-stream", action="store_true", help="Disable streaming mode"
@@ -153,6 +163,10 @@ def chat():
     alice_system_prompt = args.alice_system_prompt or args.system_prompt
     bob_system_prompt = args.bob_system_prompt or args.system_prompt
 
+    # Parse preambles
+    alice_preamble = parse_preamble_file(args.alice_preamble)
+    bob_preamble = parse_preamble_file(args.bob_preamble)
+
     # Create and run session
     session = DualModelSession(
         alice_endpoint=alice_endpoint,
@@ -173,6 +187,8 @@ def chat():
         alice_top_level_system=alice_top_level,
         bob_top_level_system=bob_top_level,
         filter_thinking=args.filter_thinking,
+        alice_preamble=alice_preamble,
+        bob_preamble=bob_preamble,
     )
 
     try:

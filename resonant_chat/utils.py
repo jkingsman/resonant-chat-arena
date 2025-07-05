@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List, Optional
 
 
 def filter_thinking_tags(content: str) -> Tuple[str, str]:
@@ -44,3 +44,42 @@ def parse_headers(header_str: str) -> Dict[str, str]:
             'Expected JSON format, e.g.: \'{"Authorization": "Bearer YOUR_API_KEY"}\''
         )
         return {}
+
+
+def parse_preamble_file(preamble_path: Optional[str]) -> Optional[List[Dict[str, str]]]:
+    """Parse a JSON file containing preamble messages"""
+    if not preamble_path:
+        return None
+    
+    try:
+        with open(preamble_path, 'r') as f:
+            preamble = json.load(f)
+        
+        # Validate the structure
+        if not isinstance(preamble, list):
+            print(f"Error: Preamble file must contain a JSON array of messages")
+            return None
+        
+        for i, msg in enumerate(preamble):
+            if not isinstance(msg, dict):
+                print(f"Error: Message {i} in preamble must be a dictionary")
+                return None
+            if "role" not in msg or "content" not in msg:
+                print(f"Error: Message {i} in preamble must have 'role' and 'content' fields")
+                return None
+            if msg["role"] not in ["user", "assistant", "system"]:
+                print(f"Error: Message {i} has invalid role '{msg['role']}'. Must be 'user', 'assistant', or 'system'")
+                return None
+        
+        return preamble
+    
+    except FileNotFoundError:
+        print(f"Error: Preamble file not found: {preamble_path}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error parsing preamble JSON: {e}")
+        print('Expected format: [{"role": "user", "content": "Hello"}, {"role": "assistant", "content": "Hi!"}]')
+        return None
+    except Exception as e:
+        print(f"Error reading preamble file: {e}")
+        return None
