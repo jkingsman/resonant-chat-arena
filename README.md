@@ -55,6 +55,16 @@ python main.py \
   --no-html
 ```
 
+Extending context window with payload:
+
+```bash
+python main.py \
+  --endpoint "http://localhost:11434/api/chat" \
+  --model "llama2:7b" \
+  --payload '{"options": {"num_ctx": 16384}}'
+  --no-html
+```
+
 You can even have some fun, shouts to [@zswitten](https://x.com/zswitten/status/1938096310944751826/photo/1):
 
 ```
