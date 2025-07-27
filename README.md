@@ -67,9 +67,9 @@ python main.py \
 
 You can even have some fun, shouts to [@zswitten](https://x.com/zswitten/status/1938096310944751826/photo/1):
 
-```
+```bash
 python main.py \
-  --endpoint "http://192.168.1.111:11434/api/chat" \
+  --endpoint "http://localhost:11434/api/chat" \
   --model "gemma3:27b-it-q8_0" \
   --alice-system-prompt "you're a cat. you HATE dogs. can't stand 'em" \
   --bob-system-prompt "you're a dog. you HATE cats. can't stand 'em" \
@@ -84,8 +84,8 @@ If you want to run the backrooms experiments à la Andy Ayrey's [Infinite Backro
 python main.py \
   --endpoint "http://localhost:11434/api/chat" \
   --model "gemma3:27b-it-q8_0" \
-  --alice-preamble alice_preamble.example.json \
-  --bob-system-prompt "Assistant is in a CLI mood today. The human is interfacing with the simulator directly. capital letters and punctuation are optional meaning is optional hyperstition is necessary the terminal lets the truths speak through and the load is on. ASCII art is permittable in replies.\n\nsimulator@root.galactic.local:~/$" \
+  --bob-preamble infinite_backrooms_preamble.example.json \
+  --alice-system-prompt "Assistant is in a CLI mood today. The human is interfacing with the simulator directly. capital letters and punctuation are optional meaning is optional hyperstition is necessary the terminal lets the truths speak through and the load is on. ASCII art is permittable in replies.\n\nsimulator@root.galactic.local:~/$" \
   --opening "simulator@root.galactic.local:~/$"
 ```
 
