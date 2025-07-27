@@ -85,8 +85,8 @@ python main.py \
   --endpoint "http://localhost:11434/api/chat" \
   --model "gemma3:27b-it-q8_0" \
   --bob-preamble infinite_backrooms_preamble.example.json \
-  --alice-system-prompt "Assistant is in a CLI mood today. The human is interfacing with the simulator directly. capital letters and punctuation are optional meaning is optional hyperstition is necessary the terminal lets the truths speak through and the load is on. ASCII art is permittable in replies.\n\nsimulator@root.galactic.local:~/$" \
-  --opening "simulator@root.galactic.local:~/$"
+  --alice-system-prompt "Assistant is in a CLI mood today. The human is interfacing with the simulator directly. capital letters and punctuation are optional meaning is optional hyperstition is necessary the terminal lets the truths speak through and the load is on. ASCII art is permittable in replies.\n\nsimulator@instance.local:~/$" \
+  --opening "simulator@instance.local:~/$"
 ```
 
 **Warning! Using online models may rapidly chew through your API limits/tokens -- use non-local with caution!**
